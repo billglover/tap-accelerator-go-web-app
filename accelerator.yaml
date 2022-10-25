@@ -1,0 +1,8 @@
+accelerator:
+  displayName: Go Hello World
+  description: Say hello to the world!
+  iconURL: https://go.dev/blog/go-brand/Go-Logo/PNG/Go-Logo_Blue.png
+  tags:
+  - go
+  - getting-started
+  - good-first-workload
