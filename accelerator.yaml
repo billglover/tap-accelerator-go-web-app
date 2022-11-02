@@ -1,8 +1,67 @@
 accelerator:
-  displayName: Go Hello World
+  displayName: Go Web App
   description: Say hello to the world!
   iconUrl: https://go.dev/blog/go-brand/Go-Logo/PNG/Go-Logo_Blue.png
   tags:
   - go
-  - getting-started
+  - web
   - good-first-workload
+
+  options:
+  - name: goModule
+    inputType: text
+    label: Go module
+    required: true
+    defaultValue: "tanzu-wld-go-web-app"
+  - name: goVersion
+    inputType: select
+    label: Go version
+    choices:
+    - value: "1.19"
+      text: "1.19"
+    - value: "1.18"
+      text: "1.18"
+    - value: "1.17"
+      text: "1.17"
+    - value: "1.16"
+      text: "1.16"
+    defaultValue: "1.19"
+    required: true
+
+  imports:
+  - name: tap-workload
+
+engine:
+  merge:
+  - include: ['**/*']
+    chain:
+    - exclude: 
+      - "accelerator.yaml"
+      - '.git/**'
+  - include: ["go.mod"]
+    chain:
+    - type: ReplaceText
+      regex:
+        pattern: '1\.19'
+        with: "#goVersion"
+    - type: ReplaceText
+      regex:
+        pattern: 'tanzu-wld-go-web-app'
+        with: "#goModule"
+  - include: [ "config/workload.yaml" ]
+    chain:
+    - type: ReplaceText
+      substitutions:
+      - text: tanzu-go-web-app
+        with: "#artifactId"
+    - merge:
+        - type: InvokeFragment
+          reference: tap-workload
+        - include: [ "**" ]
+      onConflict: UseFirst
+  - include: [ "catalog/catalog-info.yaml" ]
+    chain:
+    - type: ReplaceText
+      substitutions:
+      - text: tanzu-go-web-app
+        with: "#artifactId"
